@@ -12,6 +12,24 @@ export const postLogin = async ({ phone }) => {
   }
 };
 
+export const sendOtp = async (phone) => {
+  try {
+    return await post(`${API_URL}/send-otp`, { phone });
+  } catch (error) {
+    console.error("Error sending otp: ", error);
+  }
+};
+
+export const verifyOtp = async (data) => {
+  try {
+    return await post(`${API_URL}/verify-otp`, {
+      ...data,
+    });
+  } catch (error) {
+    console.error("Error verifying otp: ", error);
+  }
+};
+
 export const postRegister = async ({
   firstname,
   lastname,
@@ -29,6 +47,22 @@ export const postRegister = async ({
   roadWorthyCertificate,
 }) => {
   try {
+    console.log("registering...", {
+      firstname,
+      lastname,
+      email,
+      phone,
+      profile_picture,
+      driversLicense,
+      type,
+      brand,
+      model,
+      color,
+      plateNumber,
+      year,
+      vehicle_license,
+      roadWorthyCertificate,
+    });
     return await post(`${API_URL}/driver`, {
       firstname,
       lastname,

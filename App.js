@@ -15,6 +15,7 @@ import RegistrationSuccess from "./src/pages/Auth/RegistrationSuccess";
 import VerifyCode from "./src/pages/Auth/VerifyCode";
 import MainLayout from "./src/pages/Main/MainLayout";
 import { FontSizes, Fonts } from "./src/utils/styles";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 const Stack = createNativeStackNavigator();
 
@@ -98,6 +99,7 @@ export default function App() {
           >
             <DriverProvider>
               <RegistrationProvider>
+                <BottomSheetModalProvider mode="modal">
                   <SpinnerProvider>
                     <PhoneAuthProvider>
                       <Stack.Navigator>
@@ -114,6 +116,7 @@ export default function App() {
                       </Stack.Navigator>
                     </PhoneAuthProvider>
                   </SpinnerProvider>
+                </BottomSheetModalProvider>
               </RegistrationProvider>
             </DriverProvider>
           </ToastProvider>

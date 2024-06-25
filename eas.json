@@ -1,16 +1,15 @@
 {
-  "cli": {
-    "version": ">= 7.1.3"
-  },
   "build": {
     "preview": {
+      "env": {
+        "EXPO_PUBLIC_GOOGLE_MAP_API_KEY": "AIzaSyDeEW9L9JFBpApYs8HHhqJloKsoJaOvie4",
+        "EXPO_PUBLIC_SECRET_KEY": "nomzE6sApSxosd/5mgw/bA9qQ2/qAy/uF/0Aa+xsaFVY3ApyBMTOLWmikfvp6axDhYO4+ORr0yzb7oc+k8IWkA==",
+        "EXPO_PUBLIC_API_URL": "https://getder-backend-production.up.railway.app/api/v1",
+        "EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME": "dt7q7ae4h",
+        "EXPO_PUBLIC_UNSIGNED_UPLOAD_PRESET": "dgm8qvml"
+      },
       "android": {
         "buildType": "apk"
-      }
-    },
-    "preview2": {
-      "android": {
-        "gradleCommand": ":app:assembleRelease"
       }
     },
     "preview3": {

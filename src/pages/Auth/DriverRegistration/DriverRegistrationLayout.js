@@ -54,7 +54,7 @@ const DriverRegistrationLayout = ({ navigation }) => {
 
       setSpinner(true);
 
-      let { data } = await vehicleTypes();
+      console.log("Fetching vehicle types...");
 
       const profile_picture = await uploadImage(registration.profile_picture);
 
@@ -62,15 +62,12 @@ const DriverRegistrationLayout = ({ navigation }) => {
 
       const vehicle_license = await uploadImage(registration.vehicle_license);
 
-      setRegistration({
+      const resp = await postRegister({
         ...registration,
         profile_picture,
         driversLicense,
         vehicle_license,
-        type: data.find((type) => type.type === registration.type)._id,
       });
-
-      const resp = await postRegister(registration);
 
       if (resp) {
         await storageService.removeRegisterDriver();
@@ -79,7 +76,7 @@ const DriverRegistrationLayout = ({ navigation }) => {
         setSpinner(false);
       }
     } catch (error) {
-      console.log(error);
+      console.log("Error:", error);
       setSpinner(false);
       toast.show(error.message, {
         type: "danger",

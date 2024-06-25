@@ -52,7 +52,6 @@ const FormInput = ({
   };
 
   if (type === "phone") {
-
     return (
       <View style={{ marginBottom: Spacing.s }}>
         <Text style={styles.label}>{label}</Text>
@@ -111,10 +110,20 @@ const FormInput = ({
           index={0}
           snapPoints={["85%"]}
           enablePanDownToClose={true}
-          containerStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
           backgroundComponent={(props) => <BottomSheetBackground {...props} />}
           keyboardBlurBehavior="restore"
           handleComponent={() => null}
+          backdropComponent={({ style }) => (
+            <View
+              style={[
+                {
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                },
+                style,
+              ]}
+              onTouchStart={() => ref.current?.dismiss()}
+            />
+          )}
         >
           <View style={styles.contentContainer}>
             <View style={styles.header}>

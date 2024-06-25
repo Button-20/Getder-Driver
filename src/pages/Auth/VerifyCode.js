@@ -17,7 +17,12 @@ import { useDriverContext } from "../../context/DriverContext";
 import { usePhoneAuthContext } from "../../context/PhoneAuthContext";
 import { useSpinnerContext } from "../../context/SpinnerContext";
 import { storageService } from "../../lib/storage.service";
-import { getProfile, postLogin } from "../../services/driver.service";
+import {
+  getProfile,
+  postLogin,
+  sendOtp,
+  verifyOtp,
+} from "../../services/driver.service";
 import {
   BorderRadii,
   Colors,
@@ -40,12 +45,6 @@ const VerifyCode = ({ route, navigation }) => {
   const toast = useToast();
 
   useEffect(() => {
-    if (otp.length === 6) {
-      handleSubmit();
-    }
-  }, [otp]);
-
-  useEffect(() => {
     const interval = setInterval(() => {
       if (timer > 0) {
         setTimer(timer - 1);
@@ -56,23 +55,29 @@ const VerifyCode = ({ route, navigation }) => {
     return () => clearInterval(interval);
   }, [timer]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (otp) => {
     try {
       // Validate the form
-      if (!otp) return;
+      if (otp.length !== 4) return;
 
       setSpinner(true);
       // If there are no errors, submit the form
-      const userCredentials = await phoneAuth.confirm(otp);
+      const verificationResp = await verifyOtp({
+        otp,
+        phone: route.params.phone,
+      });
+      if (verificationResp.status !== 200)
+        throw new Error(verificationResp.message);
 
       const resp = await postLogin({
-        phone: userCredentials.user.phoneNumber,
+        phone: route.params.phone,
         authMethod: "local",
       });
+
       await storageService.setAccessToken(resp.token);
-      let profile = await getProfile();
+
+      const profile = await getProfile();
       setDriver(profile.data || null);
-      setPhoneAuth(null);
       setOtp("");
       navigation.navigate("MainLayout");
       setSpinner(false);
@@ -95,18 +100,22 @@ const VerifyCode = ({ route, navigation }) => {
           Enter the verification code {"\n"}sent to you
         </Text>
         <Text style={styles.subHeading}>
-          We have sent a six digit code to {route.params.phone}
+          We have sent a four digit code to {route.params.phone}
         </Text>
         <View style={styles.form}>
           <OtpInput
-            numberOfDigits={6}
+            numberOfDigits={4}
             focusColor={Colors.accent}
             value={otp}
             autoFocus
             onTextChange={(text) => setOtp(text)}
+            onFilled={async (text) => await handleSubmit(text)}
             theme={{
               pinCodeTextStyle: {
                 fontFamily: Fonts.bold,
+              },
+              pinCodeContainerStyle: {
+                width: "20%",
               },
             }}
           />
@@ -115,15 +124,25 @@ const VerifyCode = ({ route, navigation }) => {
       <View style={styles.bottomSection}>
         <TouchableOpacity
           activeOpacity={0.5}
-          onPress={() => {}}
+          onPress={async () => {
+            await sendOtp(route.params.phone);
+            setTimer(30);
+            setOtp("");
+          }}
           style={styles.register}
+          disabled={timer > 0}
         >
           <Restart style={{ width: 24, height: 24 }} />
           <Text style={styles.registerText}> Resend Code in {timer}s</Text>
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.5}
-          onPress={() => {}}
+          onPress={async () => {
+            if (spinner) return;
+            setSpinner(true);
+            await handleSubmit(otp);
+            setSpinner(false);
+          }}
           style={styles.button}
         >
           <Text style={styles.buttonText}>

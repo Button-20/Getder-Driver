@@ -2,7 +2,7 @@ import Geolocation from "@react-native-community/geolocation";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import { useToast } from "react-native-toast-notifications";
 // import ChallengeCard from "../../../components/application/ChallengeCard";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
@@ -74,30 +74,40 @@ const Home = () => {
   });
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") return;
+    Location.requestForegroundPermissionsAsync()
+      .then(({ status }) => {
+        if (status !== "granted")
+          return Alert.alert(
+            "Permission not granted. Restart the application to grant permission."
+          );
 
-      Geolocation.getCurrentPosition(async ({ coords }) => {
-        const { results } = await getReverseGeocode(
-          `${coords.latitude},${coords.longitude}`
-        );
-        const location = {
-          description: results[0].formatted_address,
-          coords,
-        };
+        Geolocation.getCurrentPosition(({ coords }) => {
+          getReverseGeocode(`${coords.latitude},${coords.longitude}`).then(
+            async ({ results }) => {
+              const new_location = {
+                description: results[0].formatted_address,
+                coords,
+              };
 
-        setLocation(location);
-        joinSocketServer(await storageService.getAccessToken(), location);
-        newRequestListener();
-        negotiationUpdateListener();
-      });
-    })();
+              setLocation(new_location);
+              joinSocketServer(
+                await storageService.getAccessToken(),
+                new_location
+              );
+              newRequestListener();
+              negotiationUpdateListener();
+            }
+          );
+        });
+      })
+      .catch(console.log);
+  }, []);
+
+  useEffect(() => {
     getAllRequests();
   }, []);
 
   useEffect(() => {
-    console.log(negotiation);
     !negotiation && bottomSheetRef.current?.present();
     negotiation?.request && bottomSheetRef2.current?.present();
   }, [negotiation?.request]);
@@ -108,7 +118,8 @@ const Home = () => {
       await updateProfile({
         available,
       });
-      negotiationUpdateListener();
+      await negotiationUpdateListener();
+      joinSocketServer(await storageService.getAccessToken(), location);
     } catch (error) {
       // console.log("Error: ", error);
       toast.show(error.message, {
@@ -120,6 +131,7 @@ const Home = () => {
 
   const getAllRequests = async () => {
     try {
+      setRequests([]);
       const resp = await getLatestRequests();
       setRequests(resp.data);
     } catch (error) {
@@ -135,7 +147,6 @@ const Home = () => {
     try {
       const resp = await postNegotiation({
         request: offer._id,
-        driver: driver._id,
         price: offer.suggested_price,
         code: offer.currency.code,
         symbol: offer.currency.symbol,

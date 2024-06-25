@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import MapViewStyle from "../../utils/mapviewstyle.json";
@@ -28,6 +28,9 @@ const GoogleMapComponent = ({ location, mapRef, request, negotiation }) => {
           apikey={process.env.EXPO_PUBLIC_GOOGLE_MAP_API_KEY}
           strokeWidth={3}
           strokeColor={Colors.accent}
+          onError={(errorMessage) => {
+            Alert.alert("Error in getting directions", errorMessage);
+          }}
         />
       )}
       {request && request.pickup_location && (

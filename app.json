@@ -15,8 +15,7 @@
     "plugins": [
       "expo-router",
       "expo-location",
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth"
+      "@react-native-firebase/app"
     ],
     "ios": {
       "supportsTablet": true

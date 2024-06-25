@@ -1,6 +1,4 @@
 import { AntDesign } from "@expo/vector-icons";
-
-import auth from "@react-native-firebase/auth";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
@@ -16,7 +14,7 @@ import { useToast } from "react-native-toast-notifications";
 import BackButton from "../../components/ui/BackButton";
 import { usePhoneAuthContext } from "../../context/PhoneAuthContext";
 import { useSpinnerContext } from "../../context/SpinnerContext";
-import { postLogin } from "../../services/driver.service";
+import { sendOtp } from "../../services/driver.service";
 import {
   BorderRadii,
   Colors,
@@ -64,11 +62,10 @@ const PhoneScreen = ({ navigation }) => {
     setSpinner(true);
 
     try {
-      const { status } = await postLogin({ phone, authMethod: "local" });
-
-      if (status === 200) {
-        const authCredential = await auth().signInWithPhoneNumber(phone);
-        setPhoneAuth(authCredential);
+      const resp = await sendOtp(phone);
+      if (resp.status === 200) {
+        // const authCredential = await auth().signInWithPhoneNumber(phone);
+        // setPhoneAuth(authCredential);
         navigation.navigate("VerifyCode", { phone });
         setForm({ phone: "" });
       } else {
@@ -81,12 +78,11 @@ const PhoneScreen = ({ navigation }) => {
     setSpinner(false);
   };
 
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" backgroundColor="white" />
       <View>
-        <BackButton navigation={navigation} />
+        {/* <BackButton navigation={navigation} /> */}
         <Text style={styles.heading}>Hey, tell us your mobile number</Text>
         <Text style={styles.subHeading}>
           We’ll send a verification code to this number
@@ -182,7 +178,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.bold,
     fontSize: FontSizes.l,
     color: Colors.primary,
-    marginTop: Spacing.m,
+    marginTop: Spacing.m * 3,
   },
 
   subHeading: {

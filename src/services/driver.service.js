@@ -47,22 +47,6 @@ export const postRegister = async ({
   roadWorthyCertificate,
 }) => {
   try {
-    console.log("registering...", {
-      firstname,
-      lastname,
-      email,
-      phone,
-      profile_picture,
-      driversLicense,
-      type,
-      brand,
-      model,
-      color,
-      plateNumber,
-      year,
-      vehicle_license,
-      roadWorthyCertificate,
-    });
     return await post(`${API_URL}/driver`, {
       firstname,
       lastname,

@@ -57,8 +57,8 @@ const AddVehicle = ({ setStep, step }) => {
       ]);
     };
 
-    getCarBrands();
     getVehicleTypes();
+    getCarBrands();
     getColors();
   }, []);
 
